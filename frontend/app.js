@@ -10,13 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
   //    problem is the first guess will always be shitty, but if you can pick "voice line" first then you can win the game in one guess and feel smart.
   //
   // steps:
-  // get database of all hearthstone cards. once per day or whatever. store somewhere and retrieve with other api.
-  // remove other translations from api response
+  // get all cards from hearthstoneapi, then pick and random card.
+  // get that card's art and voice line from the wiki
   // present user with all of a random card's attributes hidden under buttons
   // add game loop, reset for new random card, add give up button, etc
   // fine tune point values
   // make look good
-  // GET get-cards.py PUSHING TO S3 once a day. change site to rely on s3 instead of rawgithubcontent
 
   //https://develop.battle.net/documentation/guides/getting-started
   //https://develop.battle.net/documentation/hearthstone/game-data-apis
@@ -24,16 +23,49 @@ document.addEventListener('DOMContentLoaded', () => {
   // code here
 
   class Card {
-    constructor(name) {
+    constructor(name, cardType, manaCost, attack, health, rarity, cardClass, set, flavorText, keywords, spellSchool, durability, armor) {
       this.name = name
+      this.cardType = cardType
+      this.manaCost = manaCost
+      this.attack = attack //minion
+      this.health = health //minion, hero card, location
+      this.rarity = rarity
+      this.cardClass = cardClass
+      this.set = set
+      this.flavorText = flavorText
+      this.keywords = keywords
+      this.spellSchool = spellSchool //spell
+      this.durability = durability //weapon
+      this.armor = armor //hero card
     }
   }
 
-  fetch("https://koey8vhq3c.execute-api.us-east-2.amazonaws.com/hearthstone-wordle/get-cards", {method:'GET', headers:{'Content-Type': 'application/json'}})
+  fetch("https://api.hearthstonejson.com/v1/latest/enUS/cards.collectible.json")
   .then(res => res.json())
   .then(data => {
-    console.log(data.body)
+    console.log(data)
+
+    let cards = []
+    data.forEach(element => {
+      cards.push(new Card(
+        element.name,
+        element.type,
+        element.cost,
+        element.attack,
+        element.health,
+        element.rarity,
+        element.cardClass,
+        element.set,
+        element.flavor,
+        element.mechanics,
+        element.spellSchool,
+        element.durability,
+        element.armor
+      ))
+    });
+    console.log(cards)
   })
 
+  
 
 })
