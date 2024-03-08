@@ -90,7 +90,8 @@ document.addEventListener('DOMContentLoaded', () => {
     createButton("spell-school", "Spell School", randomCard.spellSchool);
     createButton("durability", "Durability", randomCard.durability);
     createButton("armor", "Armor", randomCard.armor);
-    createButton("card-art", "Card Art", getCardArt(randomCard.id));
+    getCardArt(randomCard.id);
+    //getCardVoice(randomCard.id, randomCard.set);
 
     function createButton(id, text, property) {
       if (property == undefined) {return}
@@ -98,22 +99,32 @@ document.addEventListener('DOMContentLoaded', () => {
       button.id = id;
       button.innerText = text;
       button.onclick = () => {
-      button.innerText = property;
+        button.innerText = property;
       }
       cardDiv.appendChild(button);
     }
 
-    function getCardArt(cardId) {
-      return fetch(`https://art.hearthstonejson.com/v1/orig/${cardId}.png`, { mode: 'no-cors' })
-        .then(response => response.blob())
-        .then(blob => {
-          const imgUrl = URL.createObjectURL(blob);
-          const img = document.createElement('img');
-          img.src = imgUrl;
-          return img;
-        });
+    async function getCardArt(cardId) {
+      const img = document.createElement('img');
+      img.src = `https://art.hearthstonejson.com/v1/orig/${cardId}.png`;
+      img.style.display = 'none'; // hide the image initially
+      cardDiv.appendChild(img);
+
+      const showImageButton = document.createElement('button');
+      showImageButton.innerText = 'Show Card Art';
+      showImageButton.onclick = () => {
+        img.style.display = 'block'; // show the image when the button is pressed
+      }
+      cardDiv.appendChild(showImageButton);
     }
 
+    async function getCardVoice(id) {
+      fetch(`https://hearthstonesounds.s3.amazonaws.com/${id}_A.wav`, { mode: 'no-cors' })
+      .then(res => res.json())
+      .then(data => {
+        console.log(data)
+      })
+    }
   }
 
 })
