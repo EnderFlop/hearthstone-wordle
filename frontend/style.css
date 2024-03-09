@@ -1,4 +1,55 @@
-#card-div {
-  display: flex;
-  justify-content: space-between;
+@font-face {
+  font-family: "Belwe Medium";
+  font-weight: 700;
+  src: url(../media/OPTIBelwe-Medium.otf) format("opentype");
 }
+
+* {
+  font-family: "Belwe Medium";
+  font-weight: 100;
+}
+
+body {
+  background-color: rgb(77, 107, 241);
+}
+
+#card-header {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+}
+
+#img-div {
+  display: flex;
+  justify-content: center;
+}
+
+#buttons-div {
+  position: absolute;
+  top: 90%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+}
+
+#buttons-div button {
+  cursor: pointer;
+}
+
+#buttons-div div {
+  background-size: 70px 70px;
+  background-repeat: no-repeat;
+  width: 110px;
+  height: 70px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  color: white;
+  /* todo: add text shadow */
+}
+
+

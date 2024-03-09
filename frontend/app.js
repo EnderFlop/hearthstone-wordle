@@ -41,8 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
   fetch("https://api.hearthstonejson.com/v1/latest/enUS/cards.collectible.json")
   .then(res => res.json())
   .then(data => {
-    console.log(data)
-
     let cards = []
     data.forEach(element => {
       cards.push(new Card(
@@ -60,71 +58,113 @@ document.addEventListener('DOMContentLoaded', () => {
         element.spellSchool,
         element.durability,
         element.armor
-
       ))
     });
     console.log(cards)
-
     displayCard(cards)
   })
+})
 
-  function displayCard(cards){
-    let randomCard = cards[Math.floor(Math.random() * cards.length)]
+function displayCard(cards){
+  let randomCard = cards[Math.floor(Math.random() * cards.length)]
+  console.log(randomCard)
+  if (randomCard.cardType == 'HERO') {
+    displayCard(cards)
+    return
+  }
 
-    let cardDiv = document.getElementById('card-div');
-    cardDiv.innerHTML = '';
+  let cardHeader = document.getElementById('card-header')
+  cardHeader.innerHTML = '';
 
-    let cardType = document.createElement('h1')
-    cardType.innerText = randomCard.cardType
-    cardDiv.appendChild(cardType)
+  let cardType = document.createElement('h1')
+  cardType.innerText = randomCard.cardType + ":"
+  cardHeader.appendChild(cardType)
 
-    createButton("card-name", "Card Name", randomCard.name);
-    createButton("mana-cost", "Mana Cost", randomCard.manaCost);
-    createButton("attack", "Attack", randomCard.attack);
-    createButton("health", "Health", randomCard.health);
-    createButton("rarity", "Rarity", randomCard.rarity);
-    createButton("card-class", "Card Class", randomCard.cardClass);
-    createButton("set", "Set", randomCard.set);
-    createButton("flavor-text", "Flavor Text", randomCard.flavorText);
-    createButton("keywords", "Keywords", randomCard.keywords);
-    createButton("spell-school", "Spell School", randomCard.spellSchool);
-    createButton("durability", "Durability", randomCard.durability);
-    createButton("armor", "Armor", randomCard.armor);
-    getCardArt(randomCard.id);
-    //getCardVoice(randomCard.id, randomCard.set);
+  let cardName = document.createElement('h1');
+  cardName.id = 'card-name';
+  cardName.innerText = '?????';
+  cardHeader.appendChild(cardName);
 
-    function createButton(id, text, property) {
-      if (property == undefined) {return}
-      let button = document.createElement('button');
+  let imgDiv = document.getElementById('img-div');
+  imgDiv.innerHTML = '';
+
+  let buttonsDiv = document.getElementById('buttons-div');
+  buttonsDiv.innerHTML = '';    
+
+  createButton("mana-cost", "Mana Cost", randomCard.manaCost, "../media/gem.png");
+  createButton("attack", "Attack", randomCard.attack, "../media/attack.png");
+  createButton("durability", "Durability", randomCard.durability);
+  createButton("health", "Health", randomCard.health, "../media/health.png");
+  createButton("armor", "Armor", randomCard.armor);
+  createButton("spell-school", "Spell School", randomCard.spellSchool);
+  createButton("rarity", "Rarity", randomCard.rarity);
+  createButton("card-class", "Card Class", randomCard.cardClass);
+  createButton("set", "Set", randomCard.set);
+  createButton("flavor-text", "Flavor Text", randomCard.flavorText);
+  createButton("keywords", "Keywords", randomCard.keywords);
+  getCardArt(randomCard.id);
+  //getCardVoice(randomCard.id, randomCard.set);
+  
+  let revealButton = document.createElement('button');
+  revealButton.innerText = 'Reveal Card Name';
+  revealButton.onclick = () => {
+    cardName.innerText = randomCard.name;
+  }
+  buttonsDiv.appendChild(revealButton);
+
+  let restartButton = document.createElement('button');
+  restartButton.innerText = 'Restart';
+  restartButton.onclick = () => {
+    displayCard(cards);
+  }
+  buttonsDiv.appendChild(restartButton);
+
+  function createButton(id, text, property, image) {
+    if (property == undefined) {return}
+
+    let button;
+    
+    if (image) {
+      button = document.createElement('div');
+      button.id = id;
+      button.style.backgroundImage = `url(${image})`;
+      button.onclick = () => {
+        button.innerText = property;
+      }
+      buttonsDiv.appendChild(button);
+    }
+
+    else {
+      button = document.createElement('button');
       button.id = id;
       button.innerText = text;
       button.onclick = () => {
         button.innerText = property;
       }
-      cardDiv.appendChild(button);
     }
 
-    async function getCardArt(cardId) {
-      const img = document.createElement('img');
-      img.src = `https://art.hearthstonejson.com/v1/orig/${cardId}.png`;
-      img.style.display = 'none'; // hide the image initially
-      cardDiv.appendChild(img);
-
-      const showImageButton = document.createElement('button');
-      showImageButton.innerText = 'Show Card Art';
-      showImageButton.onclick = () => {
-        img.style.display = 'block'; // show the image when the button is pressed
-      }
-      cardDiv.appendChild(showImageButton);
-    }
-
-    async function getCardVoice(id) {
-      fetch(`https://hearthstonesounds.s3.amazonaws.com/${id}_A.wav`, { mode: 'no-cors' })
-      .then(res => res.json())
-      .then(data => {
-        console.log(data)
-      })
-    }
+    buttonsDiv.appendChild(button);
   }
 
-})
+  async function getCardArt(cardId) {
+    const img = document.createElement('img');
+    img.src = `https://art.hearthstonejson.com/v1/orig/${cardId}.png`;
+    img.style.opacity = 0; // hide the image initially
+    imgDiv.appendChild(img);
+
+    const showImageButton = document.createElement('button');
+    showImageButton.innerText = 'Show Card Art';
+    showImageButton.onclick = () => {
+      img.style.opacity = 100; // show the image when the button is pressed
+    }
+    buttonsDiv.appendChild(showImageButton);
+  }
+
+  async function getCardVoice(id) {
+    fetch(`https://hearthstonesounds.s3.amazonaws.com/${id}_A.wav`, { mode: 'no-cors' })
+    .then(res => res.json())
+    .then(data => {
+      console.log(data)
+    })
+  }
+}
